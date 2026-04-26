@@ -250,13 +250,6 @@ Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan me
 -> Triggers: Mini-WMS / Sample Mgt (Wajib lapor terima barang)
 -> Triggers: Return SLA Flagging (Bebas / Wajib Retur)`;
 
-        // Cek apakah data dari file lokal mindmap_data.js berhasil dimuat
-        if (typeof window.savedMindmapData !== 'undefined' && window.savedMindmapData.trim() !== '') {
-            document.getElementById('markdownInput').value = window.savedMindmapData;
-        } else {
-            document.getElementById('markdownInput').value = defaultText;
-        }
-
         // Variabel Global D3
         let svg, g, zoom, rootD3;
         let i = 0;
@@ -672,6 +665,26 @@ Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan me
             
             alert('Teks berhasil diunduh sebagai "mindmap_data.js".\n\n1. Simpan/pindahkan file ini ke folder yang SAMA dengan file index.html Anda.\n2. Timpa (replace) jika file sebelumnya sudah ada.\n3. Saat Anda me-refresh browser, HTML akan otomatis membaca teks ini.');
         });
+
+        // ==========================================
+        // INISIALISASI SAAT HALAMAN SELESAI DIMUAT
+        // ==========================================
+        // Cek apakah data dari file lokal mindmap_data.js berhasil dimuat
+        if (typeof window.savedMindmapData !== 'undefined' && window.savedMindmapData.trim() !== '') {
+            // Set text dari file lokal
+            document.getElementById('markdownInput').value = window.savedMindmapData;
+            
+            // Otomatis buat mindmap
+            document.getElementById('generateBtn').click();
+            
+            // Otomatis jalankan mode fullscreen
+            if (!isFullscreen) {
+                document.getElementById('fullscreenBtn').click();
+            }
+        } else {
+            // Set text default jika tidak ada file lokal
+            document.getElementById('markdownInput').value = defaultText;
+        }
 
     </script>
 </body>
