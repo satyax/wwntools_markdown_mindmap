@@ -1,43 +1,82 @@
-// File ini di-generate otomatis oleh aplikasi Mindmap Generator
-window.savedMindmapData = `LNG SYSTEM FOUNDATION MIND MAP (LEGO BLOCK CONCEPT)
-
-Architectural Approach: Composable Business Architecture (Each entity is independent and can be freely assembled within a Project Container).
-
 1. THE BLOCKS (Master Data / Foundation Entities)
 
 These are the raw Lego pieces. They stand alone as a centralized repository before being assembled.
 
 1.1. Entity Directory (Stakeholders)
 
-1.1.1. Internal (LNG Company / L&G)
+1.1.1. Clients
 
-1.1.2. External Partners (STREAM, Sinemart, DRM)
+1.1.1.a. Internal (LNG Company / L&G)
 
-1.1.3. Agency
+1.1.1.b. External Partners (STREAM, Sinemart, DRM)
 
-1.1.4. Brand
+1.1.2. Agency
 
-1.1.4.a. Sub-Brand / Category
+1.1.2.a. Managed Brands Portfolio (Relational mapping/linking to Master Brands in 1.1.3)
 
-1.1.4.b. Product / SKU
+1.1.3. Brand (Independent entity; can be Direct or Agency-managed)
 
-1.1.5. Legal & Tax Profiles: (Tax IDs/NPWP, Business Registration/NIB, Finance PICs for each entity above - Crucial for the Finance Module).
+1.1.3.a. Sub-Brand / Category
+
+1.1.3.b. Product / SKU
+
+1.1.4. Legal & Tax Profiles: (Tax IDs/NPWP, Business Registration/NIB, Finance PICs for each entity above - Crucial for the Finance Module).
 
 1.2. Resource Directory (Company Assets)
 
-1.2.1. Hosts / Talents (Internal IP, External, Guest Stars/DA)
+1.2.1. Hosts / Talents
 
-1.2.2. Studios / Rooms (Capacity, Dedicated Brand Tagging)
+1.2.1.a. Internal IP
 
-1.2.3. Platforms (TikTok, Shopee, Tokopedia, Instagram)
+1.2.1.b. External Affiliates
 
-1.2.4. Digital Account Registry: (Managed Seller Center Accounts, Affiliate Accounts, Official Accounts).
+1.2.1.c. Guest Stars / DA (Dangdut Academy)
 
-1.2.5. Equipment Assets: (Cameras, Lighting, Livestreaming Smartphones - allocated per Studio).
+1.2.2. Studios / Rooms
+
+1.2.2.a. [Attribute] Room Capacity
+
+1.2.2.b. [Attribute] Dedicated Brand Tagging
+
+1.2.3. Platforms
+
+1.2.3.a. TikTok
+
+1.2.3.b. Shopee
+
+1.2.3.c. Tokopedia
+
+1.2.3.d. Instagram
+
+1.2.4. Digital Account Registry:
+
+1.2.4.a. Managed Seller Center Accounts
+
+1.2.4.b. Affiliate / Creator Accounts
+
+1.2.4.c. Official Brand Accounts
+
+1.2.5. Equipment Assets:
+
+1.2.5.a. Cameras & Visuals
+
+1.2.5.b. Lighting Systems
+
+1.2.5.c. Livestreaming Smartphones
+
+1.2.5.d. [Relation] Allocation Tag (Linked to specific Studio)
 
 1.3. Catalog & Pricing (Service Offerings)
 
-1.3.1. Master SOWs (Standardized Service Blocks: Livestreaming, Short Video Production, Ads Top-Up, etc.)
+1.3.1. Master SOWs (Standardized Service Blocks)
+
+1.3.1.a. Livestreaming Hours (Hourly / Session-based metric)
+
+1.3.1.b. Short Video Production (Deliverable / URL-based metric)
+
+1.3.1.c. Ads Top-Up / Targeted Plan (Budget pass-through metric)
+
+1.3.1.d. Event / Offline Activation (Project-based metric)
 
 1.3.2. Rate Cards (Dynamic Pricing: Host A + Studio B = Rate C)
 
@@ -51,15 +90,33 @@ This is the "Lego Board". The area where the Commercial/Sales team assembles pie
 
 2.1.2. Client & Stakeholder Matrix (Project Ownership Structure)
 
-2.1.2.a. Ownership Scope: (Pure Internal / Pure External / Joint-Hybrid).
+2.1.2.a. Ownership Scope
 
-2.1.2.b. Contracting Party: (Direct Brand / Agency / Internal Division).
+Pure Internal
 
-2.1.2.c. Represented Brands: (List of Brands executed under an Agency).
+Pure External
+
+Joint-Hybrid
+
+2.1.2.b. Contracting Party (Billing Target)
+
+Direct Brand
+
+Agency
+
+Internal Division
+
+2.1.2.c. Represented Brands: (List of Brands executed under an Agency) [Relation to Agencies & Brands]
 
 2.1.3. Timeline (Start & End Date)
 
-2.1.4. Revenue Scheme Tag: (Flat Fee / Commission-Based / Hybrid).
+2.1.4. Revenue Scheme Tag: (Determines billing logic in Module 5)
+
+Flat Fee
+
+Commission-Based
+
+Hybrid (Flat Fee + Commission)
 
 2.1.5. Target & KPI Configuration: (Target Setting for GMV, ROAS, Views).
 
@@ -97,11 +154,21 @@ Within a single Project, Sales can attach multiple SOW blocks. Each block automa
 
 2.3.2. Buffer & Contingency Allocation (Operational safety net funds)
 
-2.3.3. Document Generator (Agreements/SPK, Addendums, Versioning)
+2.3.3. Document Generator
+
+2.3.3.a. Initial Agreements / SPK (Master contract generation)
+
+2.3.3.b. Addendums (Contract modification and SOW top-ups)
+
+2.3.3.c. [Feature] Document Versioning & Audit Trail (Tracking v1, v2, v3)
 
 2.3.4. Commission Split Rules (L&G vs Talent percentage split)
 
-2.3.5. Tax Configuration: (VAT 11% for Clients, Withholding Tax/PPh for Talents/Agencies).
+2.3.5. Tax Configuration:
+
+2.3.5.a. Value Added Tax / VAT (PPN applied to Client Invoicing / AR)
+
+2.3.5.b. Withholding Tax / PPh (PPh 21/23 deducted from Talent/Agency Payouts / AP)
 
 3. THE ENGINE RUNNER (Resource & Execution Operations)
 
@@ -109,11 +176,13 @@ When a Project (Lego Board) is activated, the operational engine starts based on
 
 3.1. Scheduling Control Center
 
-3.1.1. Studio Blocking & Multi-Tenant View
+3.1.1. Studio Blocking & Reservation (Booking transactional logic)
 
-3.1.2. Host Assignment (Includes pairing Hosts with the correct Digital Accounts).
+3.1.2. Multi-Tenant Calendar View (Unified visibility UI across all projects)
 
-3.1.3. Substitution Board (Replacement roster for absent Hosts)
+3.1.3. Host Assignment (Includes pairing Hosts with the correct Digital Accounts).
+
+3.1.4. Substitution Board (Replacement roster for absent Hosts)
 
 3.2. Field Execution
 
@@ -121,7 +190,15 @@ When a Project (Lego Board) is activated, the operational engine starts based on
 
 3.2.2. Off-site Logging (Overseas events / non-studio broadcasts)
 
-3.2.3. Sample Tracking (Item location: Main Warehouse vs. Dedicated Studio)
+3.2.3. Sample & Inventory Operations (Mini-WMS Execution)
+
+3.2.3.a. Inbound & Receiving (Logging items received from Clients/Brands)
+
+3.2.3.b. Internal Movement & Allocation (Tracking transfers: Main Warehouse <-> Dedicated Studios)
+
+3.2.3.c. Item Status & Condition Tracking (Good, Damaged, Expired)
+
+3.2.3.d. Return & Disposal Handling (Executing SLA returns to clients or dead-stock disposal)
 
 4. THE TRACKER & SCORER (Data & Campaign Engine)
 
@@ -131,7 +208,15 @@ The tracking engine ensures "SOW Promises" are fulfilled and calculates the actu
 
 4.1.1. SOW Ledger (Real-time quota burn record)
 
-4.1.2. Deliverable Repository (Proof of Publication URLs + QC Approval Gate)
+4.1.2. Deliverable & Asset Repository
+
+4.1.2.a. Content Asset Library (Cloud links to raw files, edited videos, thumbnails)
+
+4.1.2.b. QC Approval Workflow (Status tracking: Draft -> In Review -> Approved -> Revision)
+
+4.1.2.c. Publication Proofing (Live broadcast URLs, published video URLs, 24h metric screenshots)
+
+4.1.3. BAST / Handover Certificate Generator (Auto-compiled proof of completion based on approved deliverables and burnt SOW)
 
 4.2. Data Linkage (Binding Data to Projects)
 
@@ -175,8 +260,24 @@ The spearhead of cash flow. Translating numbers from the Data Engine (Area 4) in
 
 Management's eagle eye to oversee all assembled and running Lego blocks.
 
-6.1. Financial Level (Stream Profitability, Margin Leakage)
+6.1. Financial Level
 
-6.2. Operational Level (SOW Burn Rate, Host/Studio Utilization)
+6.1.1. Stream Profitability (Net profit per project/business model)
 
-6.3. Campaign Level (Platform Insights, Performer GMV Leaderboard, Actual vs. Target GMV/ROAS Tracker).`;
+6.1.2. Margin Leakage Tracker (Monitoring unbilled buffer/ads expenses)
+
+6.1.3. Cashflow Health (AR/AP Aging & Outstanding Invoices)
+
+6.2. Operational Level
+
+6.2.1. SOW Burn Rate Tracker (Pace of deliverable completion)
+
+6.2.2. Resource Utilization Rate (Idle vs. Active hours for Hosts & Studios)
+
+6.3. Campaign Level
+
+6.3.1. Platform Insights (Shopee vs. TikTok performance comparison)
+
+6.3.2. Performer GMV Leaderboard (Top converting hosts/talents)
+
+6.3.3. Actual vs. Target Tracker (Real-time GMV/ROAS vs. KPI configuration)
