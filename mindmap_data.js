@@ -1,137 +1,141 @@
 // File ini di-generate otomatis oleh aplikasi Mindmap Generator
-window.savedMindmapData = `1. THE BLOCKS (Master Data / Entitas Dasar)
+window.savedMindmapData = `LNG SYSTEM FOUNDATION MIND MAP (LEGO BLOCK CONCEPT)
 
-Ini adalah kepingan-kepingan Lego mentah. Mereka berdiri sendiri sebelum dirakit.
+Architectural Approach: Composable Business Architecture (Each entity is independent and can be freely assembled within a Project Container).
 
-1.1. Entity Directory (Siapa yang terlibat?)
+1. THE BLOCKS (Master Data / Foundation Entities)
+
+These are the raw Lego pieces. They stand alone as a centralized repository before being assembled.
+
+1.1. Entity Directory (Stakeholders)
 
 1.1.1. Internal (LNG Company / L&G)
 
-1.1.2. External Partner (STREAM, Sinemart, DRM)
+1.1.2. External Partners (STREAM, Sinemart, DRM)
 
 1.1.3. Agency
 
 1.1.4. Brand
 
-1.1.4.a. Sub-Brand / Kategori
+1.1.4.a. Sub-Brand / Category
 
 1.1.4.b. Product / SKU
 
-1.1.5. Legal & Tax Profile: (NPWP, NIB, PIC Finance untuk setiap entitas di atas - Krusial untuk Modul Finance).
+1.1.5. Legal & Tax Profiles: (Tax IDs/NPWP, Business Registration/NIB, Finance PICs for each entity above - Crucial for the Finance Module).
 
-1.2. Resource Directory (Apa aset kita?)
+1.2. Resource Directory (Company Assets)
 
-1.2.1. Host / Talent (IP Internal, Eksternal, DA, Tamu)
+1.2.1. Hosts / Talents (Internal IP, External, Guest Stars/DA)
 
-1.2.2. Studio / Room (Kapasitas, Tagging ke Dedicated Brand)
+1.2.2. Studios / Rooms (Capacity, Dedicated Brand Tagging)
 
-1.2.3. Platform (TikTok, Shopee, Tokopedia, IG)
+1.2.3. Platforms (TikTok, Shopee, Tokopedia, Instagram)
 
-1.2.4. Digital Account Registry: (Daftar Akun Seller Center, Akun Affiliate, Akun Official yang dikelola).
+1.2.4. Digital Account Registry: (Managed Seller Center Accounts, Affiliate Accounts, Official Accounts).
 
-1.2.5. Equipment Asset: (Kamera, Lighting, Smartphone Live - dialokasikan per Studio).
+1.2.5. Equipment Assets: (Cameras, Lighting, Livestreaming Smartphones - allocated per Studio).
 
-1.3. Catalog & Pricing (Apa yang kita jual?)
+1.3. Catalog & Pricing (Service Offerings)
 
-1.3.1. Master SoWs (Balok Layanan Baku: Livestream, Short Video, Ads Top-Up, dll)
+1.3.1. Master SOWs (Standardized Service Blocks: Livestreaming, Short Video Production, Ads Top-Up, etc.)
 
-1.3.2. Rate Cards (Kombinasi Dinamis: Harga Host A + Studio B = Rate C)
+1.3.2. Rate Cards (Dynamic Pricing: Host A + Studio B = Rate C)
 
 2. THE ASSEMBLY BOARD (Project Management & Commercial)
 
-Ini adalah "Papan Lego". Tempat di mana tim Sales merakit kepingan-kepingan dari area 1 menjadi sebuah kesepakatan bisnis.
+This is the "Lego Board". The area where the Commercial/Sales team assembles pieces from Area 1 into a customized business agreement.
 
-2.1. Project Container (Wadah Utama)
+2.1. Project Container (Main Wrapper)
 
 2.1.1. Project ID & Name
 
-2.1.2. Client & Stakeholder Matrix (Struktur Kepemilikan Project)
+2.1.2. Client & Stakeholder Matrix (Project Ownership Structure)
 
 2.1.2.a. Ownership Scope: (Pure Internal / Pure External / Joint-Hybrid).
 
 2.1.2.b. Contracting Party: (Direct Brand / Agency / Internal Division).
 
-2.1.2.c. Represented Brands: (Daftar Brand yang dieksekusi di bawah Agency).
+2.1.2.c. Represented Brands: (List of Brands executed under an Agency).
 
 2.1.3. Timeline (Start & End Date)
 
-2.1.4. Revenue Scheme Tag: (Flat Fee / Commission Based / Hybrid).
+2.1.4. Revenue Scheme Tag: (Flat Fee / Commission-Based / Hybrid).
 
-2.1.5. Target & KPI Configuration: (Penetapan Target GMV, Target ROAS, Target Views).
+2.1.5. Target & KPI Configuration: (Target Setting for GMV, ROAS, Views).
 
-2.2. Plug-and-Play SOWs (Atribut & Trigger)
+2.2. Plug-and-Play SOWs (Attributes & Triggers)
 
-Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan men-trigger modul operasi yang berbeda secara otomatis:
+Within a single Project, Sales can attach multiple SOW blocks. Each block automatically triggers different operational modules:
 
 2.2.1. SOW: Livestream Hours
 
--> Triggers: Room & Host Scheduling (Modul 3)
+-> Triggers: Room & Host Scheduling (Module 3)
 
--> Triggers: Digital Account Allocation (Modul 3)
+-> Triggers: Digital Account Allocation (Module 3)
 
--> Triggers: SOW Ledger / Burn Record (Modul 4)
+-> Triggers: SOW Ledger / Burn Record (Module 4)
 
 2.2.2. SOW: Short Video Production
 
 -> Triggers: Host Scheduling
 
--> Triggers: QC Video Workflow (Modul 4)
+-> Triggers: Video QC Workflow (Module 4)
 
 2.2.3. SOW: Ads / Targeted Plan
 
--> Triggers: Ads Budgeting & Debit Note Generator (Modul 5)
+-> Triggers: Ads Budgeting & Debit Note Generator (Module 5)
 
 2.2.4. SOW Attribute: "Require Samples"
 
--> Triggers: Mini-WMS / Sample Mgt (Wajib lapor terima barang)
+-> Triggers: Mini-WMS / Sample Mgt (Mandatory inbound reporting)
 
--> Triggers: Return SLA Flagging (Bebas / Wajib Retur)
+-> Triggers: Return SLA Flagging (Return Optional / Return Mandatory)
 
 2.3. Commercial & Legal Configurations
 
-2.3.1. Pricing Calculation (Total harga dari SOW yang dicolokkan)
+2.3.1. Pricing Calculation (Total value of attached SOWs)
 
-2.3.2. Buffer & Expense Allocation (Dana jaga-jaga operasional)
+2.3.2. Buffer & Contingency Allocation (Operational safety net funds)
 
-2.3.3. Document Generator (SPK, Addendum, Versioning)
+2.3.3. Document Generator (Agreements/SPK, Addendums, Versioning)
 
-2.3.4. Commission Split Rules (Persentase L&G vs Talent)
+2.3.4. Commission Split Rules (L&G vs Talent percentage split)
 
-2.3.5. Tax Configuration: (Penetapan PPN 11% untuk Klien, PPh 21/23 untuk Pemotongan Talent/Agency).
+2.3.5. Tax Configuration: (VAT 11% for Clients, Withholding Tax/PPh for Talents/Agencies).
 
-3. THE ENGINE RUNNER (Resource & Execution Ops)
+3. THE ENGINE RUNNER (Resource & Execution Operations)
 
-Saat Project (Papan Lego) diaktifkan, mesin operasional menyala berdasarkan "Triggers" dari SOW di atas.
+When a Project (Lego Board) is activated, the operational engine starts based on the "Triggers" from the SOWs above.
 
 3.1. Scheduling Control Center
 
 3.1.1. Studio Blocking & Multi-Tenant View
 
-3.1.2. Host Assignment (Termasuk pairing Host dengan Digital Account yang tepat).
+3.1.2. Host Assignment (Includes pairing Hosts with the correct Digital Accounts).
 
-3.1.3. Substitution Board (Papan pengganti jika Host cuti)
+3.1.3. Substitution Board (Replacement roster for absent Hosts)
 
 3.2. Field Execution
 
 3.2.1. Actual Time Logging (Clock-in / Clock-out)
 
-3.2.2. Off-site Logging (Acara luar negeri/tanpa studio)
+3.2.2. Off-site Logging (Overseas events / non-studio broadcasts)
 
-3.2.3. Sample Tracking (Posisi barang: Gudang vs Dedicated Studio)
+3.2.3. Sample Tracking (Item location: Main Warehouse vs. Dedicated Studio)
 
 4. THE TRACKER & SCORER (Data & Campaign Engine)
 
-Mesin perekam jejak untuk memastikan "Janji/SOW" terpenuhi dan menghitung nilai transaksi sesungguhnya.
+The tracking engine ensures "SOW Promises" are fulfilled and calculates the actual transaction value for commission payouts.
 
 4.1. Fulfillment Tracker
 
-4.1.1. SOW Ledger (Membakar kuota secara real-time)
+4.1.1. SOW Ledger (Real-time quota burn record)
 
-4.1.2. Deliverable Repository (URL Bukti Tayang + QC Approval Gate)
+4.1.2. Deliverable Repository (Proof of Publication URLs + QC Approval Gate)
 
-4.2. Data Linkage (Pengikat Data ke Project)
+4.2. Data Linkage (Binding Data to Projects)
 
-4.2.1. Store ID Mapping (Menyambungkan Toko CNF ke Project Brand Republic)
+4.2.1. Store ID Mapping (Linking e.g., 'CNF Store' data to the 'Brand Republic' Project)
 
 4.2.2. Affiliate URL Mapping
 
@@ -139,40 +143,40 @@ Mesin perekam jejak untuk memastikan "Janji/SOW" terpenuhi dan menghitung nilai 
 
 4.3.1. CSV/Excel Uploader (Shopee & TikTok Sales Data)
 
-4.3.2. Upsert Rule (Penangkal duplikasi tarikan Shopee 3x sebulan)
+4.3.2. Upsert Rule Engine (Prevents data duplication for multi-batch Shopee extracts)
 
-4.3.3. Attribution Rule Engine (Logika Click Time vs Complete Time)
+4.3.3. Attribution Rule Engine (Click Time vs. Complete Time logic)
 
-4.3.4. Commission Rule Engine (Logika Direct vs Indirect Order Shopee)
+4.3.4. Commission Rule Engine (Direct vs. Indirect Order logic for Shopee)
 
-4.3.5. Ads Spend Data Uploader: (Perekaman pengeluaran Iklan aktual dari platform untuk kalkulasi ROI/ROAS).
+4.3.5. Ads Spend Data Uploader: (Recording actual Ad spend from platforms for ROI/ROAS calculations).
 
 5. THE BANK (Financial & Billing)
 
-Ujung tombak arus kas. Menerjemahkan angka dari mesin Data (Area 4) menjadi tagihan dan pembayaran.
+The spearhead of cash flow. Translating numbers from the Data Engine (Area 4) into invoices and payouts.
 
-5.1. Inbound (Account Receivable / AR)
+5.1. Inbound (Accounts Receivable / AR)
 
-5.1.1. Invoicing (Tagihan Jasa + PPN)
+5.1.1. Invoicing (Service Fee + VAT)
 
-5.1.2. Debit Note (Tagihan Reimburse Ads berbasis Actual Spend)
+5.1.2. Debit Note (Ads Reimbursement Billing based on Actual Spend)
 
-5.2. Outbound (Account Payable / AP & Payout)
+5.2. Outbound (Accounts Payable / AP & Payouts)
 
-5.2.1. Payout Engine (Perhitungan komisi bersih kreator/partner dipotong PPh)
+5.2.1. Payout Engine (Net creator/partner commission calculation minus Withholding Tax)
 
-5.2.2. TP Commission Splitter (Mengamankan "Hidden Revenue 3%" milik L&G)
+5.2.2. TP Commission Splitter (Securing L&G's "Hidden 3% Revenue" from Targeted Plans)
 
 5.3. Cost Control
 
-5.3.1. Buffer & Expense Ledger (Melacak pemotongan dana talangan di lapangan)
+5.3.1. Buffer & Expense Ledger (Tracking operational contingency fund usage on the ground)
 
 6. THE OBSERVATORY (Analytics Dashboard)
 
-Mata elang manajemen untuk melihat seluruh Lego yang sudah dirakit dan dijalankan.
+Management's eagle eye to oversee all assembled and running Lego blocks.
 
 6.1. Financial Level (Stream Profitability, Margin Leakage)
 
 6.2. Operational Level (SOW Burn Rate, Host/Studio Utilization)
 
-6.3. Campaign Level (Platform Insights, Performer GMV Leaderboard, Actual vs Target GMV/ROAS Tracker).`;
+6.3. Campaign Level (Platform Insights, Performer GMV Leaderboard, Actual vs. Target GMV/ROAS Tracker).`;
