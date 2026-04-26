@@ -73,8 +73,6 @@
             color: #334155;
             cursor: pointer;
             transition: all 0.2s;
-            width: 100%;
-            height: 100%;
         }
         .node-card:hover {
             border-color: #94a3b8;
@@ -164,7 +162,7 @@
         </div>
     </main>
 
-    <!-- Memuat file js eksternal dari lokal jika ada (Akan error 404 di console saat pertama kali, ini normal) -->
+    <!-- Memuat file js eksternal dari lokal jika ada -->
     <script src="mindmap_data.js"></script>
 
     <script>
@@ -352,8 +350,6 @@ Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan me
 
         // Fungsi Render/Update D3 Tree
         function updateMindmap(source) {
-            const container = document.getElementById('mindmapContainer');
-            
             // D3 Tree Layout Setup. 
             // nodeSize mengatur jarak dinamis agar tidak pernah tumpang tindih
             const treeLayout = d3.tree().nodeSize([nodeHeight + nodeMargin, nodeWidth + 80]);
@@ -411,31 +407,49 @@ Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan me
                 .on('mouseout', hideTooltip)
                 .on('mousemove', moveTooltip);
 
-            // Custom HTML di dalam SVG menggunakan foreignObject
+            // Kita buat foreignObject lebih lebar sedikit untuk mengakomodasi badge/ikon + agar tidak terpotong
             nodeEnter.append('foreignObject')
-                .attr('width', nodeWidth)
+                .attr('width', nodeWidth + 24) 
                 .attr('height', nodeHeight)
                 .attr('x', 0)
-                .attr('y', -(nodeHeight / 2))
-                .html(d => {
-                    const hasChildren = d._children || (d.children && d.children.length > 0);
-                    const hasTooltip = d.data.description && d.data.description.trim() !== "";
-                    const color = getNodeColor(d);
-                    
-                    let classes = "node-card relative";
-                    if(hasTooltip) classes += " has-tooltip";
-                    
-                    return `
-                    <div class="${classes}" style="border-left: 5px solid ${color.border}; background-color: ${color.bg}; color: ${color.text};">
-                        <div class="line-clamp-2 w-full font-semibold pr-1">
-                            ${d.data.name}
-                        </div>
-                        ${hasTooltip ? '<div class="absolute right-2 top-2 w-2.5 h-2.5 bg-amber-400 rounded-full border border-white shadow-sm" title="Ada catatan tambahan"></div>' : ''}
-                    </div>
-                    `;
-                });
+                .attr('y', -(nodeHeight / 2));
 
             const nodeUpdate = nodeEnter.merge(node);
+
+            // Memperbarui isi HTML setiap kali ada expand/collapse agar tanda + dan - berubah dinamis
+            nodeUpdate.select('foreignObject').html(d => {
+                const isExpanded = d.children && d.children.length > 0;
+                const isCollapsed = d._children && d._children.length > 0;
+                const hasAnyChild = isExpanded || isCollapsed;
+                
+                const hasTooltip = d.data.description && d.data.description.trim() !== "";
+                const color = getNodeColor(d);
+                
+                let classes = "node-card relative";
+                if(hasTooltip) classes += " has-tooltip";
+                
+                // Indikator Tanda (Plus / Minus) jika mempunyai anak
+                let indicatorHTML = '';
+                if (hasAnyChild) {
+                    const icon = isCollapsed ? '+' : '−'; // Minus sign
+                    indicatorHTML = `
+                    <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 rounded-full flex items-center justify-center text-sm font-bold z-10" 
+                         style="border-color: ${color.border}; color: ${color.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                        ${icon}
+                    </div>
+                    `;
+                }
+                
+                return `
+                <div class="${classes}" style="border-left: 5px solid ${color.border}; background-color: ${color.bg}; color: ${color.text}; width: ${nodeWidth}px; height: 100%;">
+                    <div class="line-clamp-2 w-full font-semibold pr-3">
+                        ${d.data.name}
+                    </div>
+                    ${hasTooltip ? '<div class="absolute right-2 top-2 w-2.5 h-2.5 bg-amber-400 rounded-full border border-white shadow-sm" title="Ada catatan tambahan"></div>' : ''}
+                    ${indicatorHTML}
+                </div>
+                `;
+            });
 
             nodeUpdate.transition()
                 .duration(duration)
@@ -485,7 +499,7 @@ Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan me
             // Karena kita memakai `<foreignObject>` yang origin-nya di kiri atas,
             // kita offset path-nya agar menyambung di tengah pinggir box.
             const sY = s.y; 
-            const sX = s.x + (s === d ? 0 : 0); // Titik target (kiri box child)
+            const sX = s.x; // Titik target (kiri box child)
             
             const dY = d.y; 
             const dX = d.x + nodeWidth; // Titik awal (kanan box parent)
@@ -522,7 +536,7 @@ Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan me
         }
 
         function moveTooltip(event) {
-            // Menggunakan clientX dan clientY agar posisi akurat menempel di cursor mouse (relatif terhadap layar/viewport)
+            // Menggunakan clientX dan clientY agar posisi akurat menempel di cursor mouse
             const margin = 15;
             let x = event.clientX + margin;
             let y = event.clientY + margin;
@@ -642,8 +656,7 @@ Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan me
                 .replace(/`/g, '\\`')
                 .replace(/\$\{/g, '\\${');
                 
-            const jsContent = `// File ini di-generate otomatis oleh aplikasi Mindmap Generator
-window.savedMindmapData = \`${escapedText}\`;`;
+            const jsContent = `// File ini di-generate otomatis oleh aplikasi Mindmap Generator\nwindow.savedMindmapData = \`${escapedText}\`;`;
             
             // Membuat object BLOB untuk memicu unduhan file
             const blob = new Blob([jsContent], { type: 'text/javascript' });
