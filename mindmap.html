@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to Mindmap Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* D3 Mindmap Styles */
+        .node circle {
+            fill: #fff;
+            stroke: #3b82f6;
+            stroke-width: 2px;
+            transition: all 0.3s;
+        }
+        .node:hover circle {
+            fill: #eff6ff;
+            stroke: #2563eb;
+            stroke-width: 3px;
+        }
+        .node text {
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            fill: #1e293b;
+            pointer-events: none;
+        }
+        .link {
+            fill: none;
+            stroke: #cbd5e1;
+            stroke-width: 2px;
+        }
+        
+        /* Node Content Card (using foreignObject) */
+        .node-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            word-wrap: break-word;
+            font-size: 13px;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            height: 100%;
+        }
+        .node-card:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Fullscreen state */
+        .is-fullscreen {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 50;
+            border-radius: 0 !important;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row">
+
+    <!-- Left Panel: Input Area -->
+    <aside id="leftPanel" class="w-full md:w-1/3 lg:w-1/4 h-1/2 md:h-full bg-white border-r border-slate-200 flex flex-col shadow-lg z-20 transition-all duration-300">
+        <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                <i data-lucide="network"></i>
+            </div>
+            <h1 class="text-xl font-bold text-slate-800 tracking-tight">MindMap Gen</h1>
+        </div>
+        
+        <div class="flex-1 flex flex-col p-5 gap-3">
+            <label for="markdownInput" class="text-sm font-semibold text-slate-600 flex justify-between items-center">
+                Paste Markdown Anda:
+                <button id="clearBtn" class="text-xs text-red-500 hover:text-red-700">Bersihkan</button>
+            </label>
+            <textarea id="markdownInput" class="flex-1 w-full p-4 border border-slate-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono text-slate-700 leading-relaxed shadow-inner"></textarea>
+            
+            <div class="flex gap-2 mt-2">
+                <button id="generateBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-2">
+                    <i data-lucide="play" class="w-5 h-5"></i>
+                    Buat Mindmap
+                </button>
+                <button id="saveJsBtn" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-2" title="Simpan teks ke file lokal (.js)">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Right Panel: Mindmap Canvas -->
+    <main id="rightPanel" class="w-full md:w-2/3 lg:w-3/4 h-1/2 md:h-full bg-slate-50 relative flex flex-col transition-all duration-300">
+        
+        <!-- Toolbar -->
+        <div class="absolute top-4 right-4 z-30 flex gap-2">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 flex p-1">
+                <button id="zoomInBtn" class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition" title="Zoom In">
+                    <i data-lucide="zoom-in" class="w-5 h-5"></i>
+                </button>
+                <button id="zoomOutBtn" class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition" title="Zoom Out">
+                    <i data-lucide="zoom-out" class="w-5 h-5"></i>
+                </button>
+                <button id="fitViewBtn" class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition" title="Fit to Screen">
+                    <i data-lucide="maximize" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <button id="fullscreenBtn" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition" title="Toggle Fullscreen">
+                <i data-lucide="expand" class="w-5 h-5" id="fsIcon"></i>
+            </button>
+        </div>
+
+        <!-- SVG Container -->
+        <div id="mindmapContainer" class="flex-1 w-full h-full cursor-grab active:cursor-grabbing overflow-hidden">
+            <!-- D3 will inject SVG here -->
+        </div>
+
+        <!-- Tooltip -->
+        <div id="tooltip" class="fixed hidden bg-slate-800 text-white p-4 rounded-xl text-sm shadow-2xl z-[100] pointer-events-none w-72 backdrop-blur-sm bg-opacity-95 transition-opacity duration-200">
+            <h4 id="tooltipTitle" class="font-bold text-blue-300 mb-2 border-b border-slate-600 pb-1"></h4>
+            <p id="tooltipDesc" class="leading-relaxed whitespace-pre-wrap"></p>
+        </div>
+        
+        <!-- Instructions overlay -->
+        <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
+            <i data-lucide="git-merge" class="w-16 h-16 mb-4 opacity-50"></i>
+            <p class="text-lg font-medium">Klik "Buat Mindmap" untuk merender data</p>
+            <p class="text-sm mt-2">Gunakan Scroll untuk Zoom, Drag untuk Pan, Klik Node untuk Expand/Collapse</p>
+        </div>
+    </main>
+
+    <!-- Memuat file js eksternal dari lokal jika ada (Akan error 404 di console saat pertama kali, ini normal) -->
+    <script src="mindmap_data.js"></script>
+
+    <script>
+        // Inisialisasi Icons
+        lucide.createIcons();
+
+        // Data Default dari user
+        const defaultText = `1. THE BLOCKS (Master Data / Entitas Dasar)
+
+Ini adalah kepingan-kepingan Lego mentah. Mereka berdiri sendiri sebelum dirakit.
+
+1.1. Entity Directory (Siapa yang terlibat?)
+
+1.1.1. Internal (LNG Company / L&G)
+
+1.1.2. External Partner (STREAM, Sinemart, DRM)
+
+1.1.3. Agency
+
+1.1.4. Brand
+
+1.1.4.a. Sub-Brand / Kategori
+
+1.1.4.b. Product / SKU
+
+1.1.5. Legal & Tax Profile: (NPWP, NIB, PIC Finance untuk setiap entitas di atas - Krusial untuk Modul Finance).
+
+1.2. Resource Directory (Apa aset kita?)
+
+1.2.1. Host / Talent (IP Internal, Eksternal, DA, Tamu)
+
+1.2.2. Studio / Room (Kapasitas, Tagging ke Dedicated Brand)
+
+1.2.3. Platform (TikTok, Shopee, Tokopedia, IG)
+
+1.2.4. Digital Account Registry: (Daftar Akun Seller Center, Akun Affiliate, Akun Official yang dikelola).
+
+1.2.5. Equipment Asset: (Kamera, Lighting, Smartphone Live - dialokasikan per Studio).
+
+1.3. Catalog & Pricing (Apa yang kita jual?)
+
+1.3.1. Master SoWs (Balok Layanan Baku: Livestream, Short Video, Ads Top-Up, dll)
+
+1.3.2. Rate Cards (Kombinasi Dinamis: Harga Host A + Studio B = Rate C)
+
+2. THE ASSEMBLY BOARD (Project Management & Commercial)
+
+Ini adalah "Papan Lego". Tempat di mana tim Sales merakit kepingan-kepingan dari area 1 menjadi sebuah kesepakatan bisnis.
+
+2.1. Project Container (Wadah Utama)
+
+2.1.1. Project ID & Name
+
+2.1.2. Client & Stakeholder Matrix (Struktur Kepemilikan Project)
+
+2.1.2.a. Ownership Scope: (Pure Internal / Pure External / Joint-Hybrid).
+
+2.1.2.b. Contracting Party: (Direct Brand / Agency / Internal Division).
+
+2.1.2.c. Represented Brands: (Daftar Brand yang dieksekusi di bawah Agency).
+
+2.1.3. Timeline (Start & End Date)
+
+2.1.4. Revenue Scheme Tag: (Flat Fee / Commission Based / Hybrid).
+
+2.1.5. Target & KPI Configuration: (Penetapan Target GMV, Target ROAS, Target Views).
+
+2.2. Plug-and-Play SOWs (Atribut & Trigger)
+
+Di dalam 1 Project, Sales bisa memasukkan banyak balok SOW. Setiap balok akan men-trigger modul operasi yang berbeda secara otomatis:
+
+2.2.1. SOW: Livestream Hours
+-> Triggers: Room & Host Scheduling (Modul 3)
+-> Triggers: Digital Account Allocation (Modul 3)
+-> Triggers: SOW Ledger / Burn Record (Modul 4)
+
+2.2.2. SOW: Short Video Production
+-> Triggers: Host Scheduling
+-> Triggers: QC Video Workflow (Modul 4)
+
+2.2.3. SOW: Ads / Targeted Plan
+-> Triggers: Ads Budgeting & Debit Note Generator (Modul 5)
+
+2.2.4. SOW Attribute: "Require Samples"
+-> Triggers: Mini-WMS / Sample Mgt (Wajib lapor terima barang)
+-> Triggers: Return SLA Flagging (Bebas / Wajib Retur)`;
+
+        // Cek apakah data dari file lokal mindmap_data.js berhasil dimuat
+        if (typeof window.savedMindmapData !== 'undefined' && window.savedMindmapData.trim() !== '') {
+            document.getElementById('markdownInput').value = window.savedMindmapData;
+        } else {
+            document.getElementById('markdownInput').value = defaultText;
+        }
+
+        // Variabel Global D3
+        let svg, g, zoom, rootD3;
+        let i = 0;
+        const duration = 400;
+        
+        // Dimensi Node
+        const nodeWidth = 220;
+        const nodeHeight = 60;
+        const nodeMargin = 40;
+
+        // Konfigurasi Canvas D3
+        function initD3() {
+            const container = document.getElementById('mindmapContainer');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            d3.select("#mindmapContainer").selectAll("*").remove();
+
+            svg = d3.select("#mindmapContainer").append("svg")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("font-family", "Inter, sans-serif");
+
+            g = svg.append("g");
+
+            zoom = d3.zoom()
+                .scaleExtent([0.1, 3])
+                .on("zoom", (event) => {
+                    g.attr("transform", event.transform);
+                });
+
+            svg.call(zoom);
+            
+            // Double click zoom disable agar tidak bentrok dengan klik node
+            svg.on("dblclick.zoom", null);
+        }
+
+        // Fungsi Parser: Mengubah Text Markdown menjadi Struktur Hierarki JSON
+        function parseTextToTree(text) {
+            const lines = text.split('\n');
+            const nodes = [{ id: 'root', name: 'Master System', description: 'Titik Pusat Mindmap' }];
+            let currentNode = nodes[0];
+            
+            // Regex mendeteksi angka berformat 1. , 1.1. , 1.1.4.a.
+            const regex = /^([0-9]+(?:\.[0-9a-zA-Z]+)*\.?)\s+(.*)$/;
+
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
+
+                const match = trimmed.match(regex);
+                if (match) {
+                    let rawId = match[1];
+                    let name = match[2];
+                    
+                    // Normalisasi ID (Hilangkan titik di akhir jika ada)
+                    let id = rawId.endsWith('.') ? rawId.slice(0, -1) : rawId;
+
+                    // Cari ID Parent berdasarkan ID Saat ini
+                    let parts = id.split('.');
+                    parts.pop(); // Hapus level terakhir
+                    let parentId = parts.length > 0 ? parts.join('.') : 'root';
+
+                    currentNode = { id, parentId, name: `${id} ${name}`, description: '' };
+                    nodes.push(currentNode);
+                } else {
+                    // Jika bukan format judul, masukkan sebagai deskripsi (tooltip) ke node terakhir
+                    if(currentNode.description) currentNode.description += '\n';
+                    currentNode.description += trimmed;
+                }
+            });
+
+            // Convert Flat Array to Hierarchical Tree
+            const idMap = {};
+            nodes.forEach(n => { n.children = []; idMap[n.id] = n; });
+            
+            const tree = [];
+            nodes.forEach(n => {
+                if (n.parentId && idMap[n.parentId]) {
+                    idMap[n.parentId].children.push(n);
+                } else if (n.id === 'root') {
+                    tree.push(n);
+                } else {
+                    // Jika ada orphan node (format salah), tempel ke root
+                    idMap['root'].children.push(n);
+                }
+            });
+
+            return tree[0];
+        }
+
+        // Fungsi Render/Update D3 Tree
+        function updateMindmap(source) {
+            const container = document.getElementById('mindmapContainer');
+            
+            // D3 Tree Layout Setup. 
+            // nodeSize mengatur jarak dinamis agar tidak pernah tumpang tindih
+            const treeLayout = d3.tree().nodeSize([nodeHeight + nodeMargin, nodeWidth + 80]);
+
+            const treeData = treeLayout(rootD3);
+            const nodes = treeData.descendants();
+            const links = treeData.descendants().slice(1);
+
+            // Menyesuaikan posisi X agar mindmap tumbuh ke kanan
+            nodes.forEach(d => {
+                // Posisi asli tree layout d.y (kedalaman) dan d.x (vertikal)
+                // Kita tukar untuk orientasi horizontal
+                let temp = d.x;
+                d.x = d.y; 
+                d.y = temp;
+            });
+
+            // --- FUNGSI WARNA DINAMIS ---
+            const branchColors = [
+                { border: '#3b82f6', bg: '#eff6ff', text: '#1e3a8a' }, // Biru
+                { border: '#10b981', bg: '#ecfdf5', text: '#064e3b' }, // Hijau
+                { border: '#8b5cf6', bg: '#f5f3ff', text: '#4c1d95' }, // Ungu
+                { border: '#f59e0b', bg: '#fffbeb', text: '#78350f' }, // Amber
+                { border: '#ec4899', bg: '#fdf2f8', text: '#831843' }, // Pink
+                { border: '#06b6d4', bg: '#ecfeff', text: '#164e63' }, // Cyan
+                { border: '#ef4444', bg: '#fef2f2', text: '#7f1d1d' }, // Merah
+            ];
+
+            function getNodeColor(d) {
+                if (d.depth === 0) return { border: '#475569', bg: '#f8fafc', text: '#0f172a' }; // Abu-abu gelap untuk root/titik pusat
+                
+                // Cari moyang/ancestor level 1 dari node ini (Cabang Utama)
+                let ancestor = d;
+                while (ancestor.depth > 1) {
+                    ancestor = ancestor.parent;
+                }
+                
+                // Tentukan warna dari urutan/indeks ancestor di dalam root
+                let rootChildren = rootD3.children || rootD3._children || [];
+                let index = rootChildren.indexOf(ancestor);
+                if(index === -1) index = 0;
+                
+                return branchColors[index % branchColors.length];
+            }
+
+            // --- NODES ---
+            const node = g.selectAll('g.node')
+                .data(nodes, d => d.id || (d.id = ++i));
+
+            const nodeEnter = node.enter().append('g')
+                .attr('class', 'node')
+                .attr('transform', d => `translate(${source.x0 || 0},${source.y0 || 0})`)
+                .on('click', clickNode)
+                .on('mouseover', showTooltip)
+                .on('mouseout', hideTooltip)
+                .on('mousemove', moveTooltip);
+
+            // Custom HTML di dalam SVG menggunakan foreignObject
+            nodeEnter.append('foreignObject')
+                .attr('width', nodeWidth)
+                .attr('height', nodeHeight)
+                .attr('x', 0)
+                .attr('y', -(nodeHeight / 2))
+                .html(d => {
+                    const hasChildren = d._children || (d.children && d.children.length > 0);
+                    const hasTooltip = d.data.description && d.data.description.trim() !== "";
+                    const color = getNodeColor(d);
+                    
+                    let classes = "node-card relative";
+                    if(hasTooltip) classes += " has-tooltip";
+                    
+                    return `
+                    <div class="${classes}" style="border-left: 5px solid ${color.border}; background-color: ${color.bg}; color: ${color.text};">
+                        <div class="line-clamp-2 w-full font-semibold pr-1">
+                            ${d.data.name}
+                        </div>
+                        ${hasTooltip ? '<div class="absolute right-2 top-2 w-2.5 h-2.5 bg-amber-400 rounded-full border border-white shadow-sm" title="Ada catatan tambahan"></div>' : ''}
+                    </div>
+                    `;
+                });
+
+            const nodeUpdate = nodeEnter.merge(node);
+
+            nodeUpdate.transition()
+                .duration(duration)
+                .attr('transform', d => `translate(${d.x},${d.y})`);
+
+            const nodeExit = node.exit().transition()
+                .duration(duration)
+                .attr('transform', d => `translate(${source.x},${source.y})`)
+                .remove();
+
+            // --- LINKS ---
+            const link = g.selectAll('path.link')
+                .data(links, d => d.id);
+
+            const linkEnter = link.enter().insert('path', "g")
+                .attr('class', 'link')
+                .attr('d', d => {
+                    const o = {x: source.x0 || 0, y: source.y0 || 0};
+                    return diagonal(o, o);
+                });
+
+            const linkUpdate = linkEnter.merge(link);
+
+            linkUpdate.transition()
+                .duration(duration)
+                .attr('d', d => diagonal(d, d.parent))
+                .style('stroke', d => getNodeColor(d).border)
+                .style('stroke-opacity', 0.5);
+
+            const linkExit = link.exit().transition()
+                .duration(duration)
+                .attr('d', d => {
+                    const o = {x: source.x, y: source.y};
+                    return diagonal(o, o);
+                })
+                .remove();
+
+            // Simpan posisi lama untuk transisi berikutnya
+            nodes.forEach(d => {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+
+        // Fungsi membuat kurva garis (Bezier) horizontal
+        function diagonal(s, d) {
+            // Karena kita memakai `<foreignObject>` yang origin-nya di kiri atas,
+            // kita offset path-nya agar menyambung di tengah pinggir box.
+            const sY = s.y; 
+            const sX = s.x + (s === d ? 0 : 0); // Titik target (kiri box child)
+            
+            const dY = d.y; 
+            const dX = d.x + nodeWidth; // Titik awal (kanan box parent)
+
+            return `M ${sX} ${sY}
+                    C ${(sX + dX) / 2} ${sY},
+                      ${(sX + dX) / 2} ${dY},
+                      ${dX} ${dY}`;
+        }
+
+        // Toggle Expand/Collapse saat diklik
+        function clickNode(event, d) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            updateMindmap(d);
+        }
+
+        // Tooltip Logic
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTitle = document.getElementById('tooltipTitle');
+        const tooltipDesc = document.getElementById('tooltipDesc');
+
+        function showTooltip(event, d) {
+            if (!d.data.description || d.data.description.trim() === "") return;
+            
+            tooltipTitle.textContent = d.data.name;
+            tooltipDesc.textContent = d.data.description;
+            tooltip.classList.remove('hidden');
+        }
+
+        function moveTooltip(event) {
+            // Menggunakan clientX dan clientY agar posisi akurat menempel di cursor mouse (relatif terhadap layar/viewport)
+            const margin = 15;
+            let x = event.clientX + margin;
+            let y = event.clientY + margin;
+
+            // Memastikan tooltip tidak menembus layar batas kanan dan bawah
+            const tooltipRect = tooltip.getBoundingClientRect();
+            if (x + tooltipRect.width > window.innerWidth) {
+                x = event.clientX - tooltipRect.width - margin;
+            }
+            if (y + tooltipRect.height > window.innerHeight) {
+                y = event.clientY - tooltipRect.height - margin;
+            }
+
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        function hideTooltip() {
+            tooltip.classList.add('hidden');
+        }
+
+        // Main Execution
+        document.getElementById('generateBtn').addEventListener('click', () => {
+            const text = document.getElementById('markdownInput').value;
+            if(!text.trim()) {
+                alert("Harap masukkan teks markdown terlebih dahulu.");
+                return;
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+            initD3();
+
+            const treeData = parseTextToTree(text);
+            rootD3 = d3.hierarchy(treeData, d => d.children);
+            
+            // Initial position untuk animasi spawn (di titik 0,0 dari canvas internal sebelum digeser)
+            rootD3.x0 = 0;
+            rootD3.y0 = 0;
+
+            // Optional: Collapse all level 2 and beyond pada awal muat agar rapi
+            rootD3.children.forEach(collapseAll);
+
+            updateMindmap(rootD3);
+            
+            // Posisikan kamera agar root di kiri tengah, mengambil ukuran dari container
+            const containerHeight = document.getElementById('mindmapContainer').clientHeight;
+            const transform = d3.zoomIdentity.translate(50, containerHeight / 2).scale(0.8);
+            svg.transition().duration(750).call(zoom.transform, transform);
+        });
+
+        function collapseAll(d) {
+            if(d.children) {
+                d._children = d.children;
+                d._children.forEach(collapseAll);
+                d.children = null;
+            }
+        }
+
+        // Toolbar Controls
+        document.getElementById('zoomInBtn').addEventListener('click', () => {
+            svg.transition().call(zoom.scaleBy, 1.3);
+        });
+
+        document.getElementById('zoomOutBtn').addEventListener('click', () => {
+            svg.transition().call(zoom.scaleBy, 0.7);
+        });
+
+        document.getElementById('fitViewBtn').addEventListener('click', () => {
+            const containerHeight = document.getElementById('mindmapContainer').clientHeight;
+            const transform = d3.zoomIdentity.translate(50, containerHeight / 2).scale(0.8);
+            svg.transition().duration(750).call(zoom.transform, transform);
+        });
+
+        // Fullscreen Logic
+        const rightPanel = document.getElementById('rightPanel');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fsIcon = document.getElementById('fsIcon');
+        let isFullscreen = false;
+
+        fullscreenBtn.addEventListener('click', () => {
+            isFullscreen = !isFullscreen;
+            if (isFullscreen) {
+                rightPanel.classList.add('is-fullscreen');
+                fsIcon.setAttribute('data-lucide', 'shrink');
+            } else {
+                rightPanel.classList.remove('is-fullscreen');
+                fsIcon.setAttribute('data-lucide', 'expand');
+            }
+            lucide.createIcons();
+            
+            // Tunggu transisi CSS selesai, lalu update ukuran SVG
+            setTimeout(() => {
+                if(svg && rootD3) {
+                    const containerHeight = document.getElementById('mindmapContainer').clientHeight;
+                    const transform = d3.zoomIdentity.translate(50, containerHeight / 2).scale(0.8);
+                    svg.transition().duration(400).call(zoom.transform, transform);
+                }
+            }, 350);
+        });
+
+        // Clear Button
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.getElementById('markdownInput').value = '';
+        });
+
+        // Save to Local JS Button
+        document.getElementById('saveJsBtn').addEventListener('click', () => {
+            const text = document.getElementById('markdownInput').value;
+            if(!text.trim()) {
+                alert("Tidak ada teks untuk disimpan.");
+                return;
+            }
+
+            // Escape karakter khusus agar tidak menyebabkan syntax error pada file JS
+            const escapedText = text
+                .replace(/\\/g, '\\\\')
+                .replace(/`/g, '\\`')
+                .replace(/\$\{/g, '\\${');
+                
+            const jsContent = `// File ini di-generate otomatis oleh aplikasi Mindmap Generator
+window.savedMindmapData = \`${escapedText}\`;`;
+            
+            // Membuat object BLOB untuk memicu unduhan file
+            const blob = new Blob([jsContent], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mindmap_data.js'; // Harus menggunakan nama ini agar bisa dipanggil otomatis
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Teks berhasil diunduh sebagai "mindmap_data.js".\n\n1. Simpan/pindahkan file ini ke folder yang SAMA dengan file index.html Anda.\n2. Timpa (replace) jika file sebelumnya sudah ada.\n3. Saat Anda me-refresh browser, HTML akan otomatis membaca teks ini.');
+        });
+
+    </script>
+</body>
+</html>
