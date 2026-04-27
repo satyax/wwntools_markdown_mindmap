@@ -13,55 +13,102 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+        /* CSS Variables untuk Tema */
+        :root, .theme-light {
+            --panel-bg: #ffffff;
+            --canvas-bg: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #ffffff;
+            --input-text: #334155;
+            --toolbar-bg: #ffffff;
+            --toolbar-hover: #f1f5f9;
+            --tooltip-bg: rgba(30, 41, 59, 0.95);
+            --tooltip-text: #ffffff;
+        }
+        .theme-dark {
+            --panel-bg: #1e293b;
+            --canvas-bg: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --input-text: #f1f5f9;
+            --toolbar-bg: #1e293b;
+            --toolbar-hover: #334155;
+            --tooltip-bg: rgba(15, 23, 42, 0.95);
+            --tooltip-text: #f1f5f9;
+        }
+        .theme-ocean {
+            --panel-bg: #ffffff;
+            --canvas-bg: #ecfeff;
+            --text-primary: #164e63;
+            --text-secondary: #0891b2;
+            --border-color: #cffafe;
+            --input-bg: #f8fafc;
+            --input-text: #164e63;
+            --toolbar-bg: #ffffff;
+            --toolbar-hover: #cffafe;
+            --tooltip-bg: rgba(22, 78, 99, 0.95);
+            --tooltip-text: #ffffff;
+        }
+        .theme-sunset {
+            --panel-bg: #ffffff;
+            --canvas-bg: #fff7ed;
+            --text-primary: #7c2d12;
+            --text-secondary: #ea580c;
+            --border-color: #ffedd5;
+            --input-bg: #f8fafc;
+            --input-text: #7c2d12;
+            --toolbar-bg: #ffffff;
+            --toolbar-hover: #ffedd5;
+            --tooltip-bg: rgba(124, 45, 18, 0.95);
+            --tooltip-text: #ffffff;
         }
 
-        /* Custom Scrollbar */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--canvas-bg);
+            color: var(--text-primary);
+        }
+
+        /* Custom Scrollbar yang mengikuti Tema */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f5f9; 
+            background: var(--canvas-bg); 
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
+            background: var(--border-color); 
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
+            background: var(--text-secondary); 
         }
 
         /* D3 Mindmap Styles */
         .node circle {
-            fill: #fff;
+            fill: var(--panel-bg);
             stroke: #3b82f6;
             stroke-width: 2px;
             transition: all 0.3s;
         }
-        .node:hover circle {
-            fill: #eff6ff;
-            stroke: #2563eb;
-            stroke-width: 3px;
-        }
         .node text {
             font-size: 14px;
             font-family: 'Inter', sans-serif;
-            fill: #1e293b;
+            fill: var(--text-primary);
             pointer-events: none;
         }
         .link {
             fill: none;
-            stroke: #cbd5e1;
             stroke-width: 2px;
         }
         
         /* Node Content Card (using foreignObject) */
         .node-card {
-            background: white;
-            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 8px 12px;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -70,13 +117,11 @@
             justify-content: flex-start;
             word-wrap: break-word;
             font-size: 13px;
-            color: #334155;
             cursor: pointer;
             transition: all 0.2s;
         }
         .node-card:hover {
-            border-color: #94a3b8;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
             transform: translateY(-2px);
         }
 
@@ -92,30 +137,38 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row">
+<body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row theme-dark transition-colors duration-300">
 
     <!-- Left Panel: Input Area -->
-    <aside id="leftPanel" class="w-full md:w-1/3 lg:w-1/4 h-1/2 md:h-full bg-white border-r border-slate-200 flex flex-col shadow-lg z-20 transition-all duration-300">
-        <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+    <aside id="leftPanel" class="w-full md:w-1/3 lg:w-1/4 h-1/2 md:h-full bg-[var(--panel-bg)] border-r border-[var(--border-color)] flex flex-col shadow-lg z-20 transition-all duration-300">
+        <div class="p-5 border-b border-[var(--border-color)] flex items-center gap-3">
             <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i data-lucide="network"></i>
             </div>
-            <h1 class="text-xl font-bold text-slate-800 tracking-tight">MindMap Gen</h1>
+            <h1 class="text-xl font-bold text-[var(--text-primary)] tracking-tight">MindMap Gen</h1>
+            
+            <!-- Theme Dropdown -->
+            <select id="themeSelect" class="ml-auto bg-[var(--input-bg)] text-[var(--text-primary)] border border-[var(--border-color)] text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 outline-none cursor-pointer transition-colors">
+                <option value="theme-light">Light</option>
+                <option value="theme-dark" selected>Dark</option>
+                <option value="theme-ocean">Ocean</option>
+                <option value="theme-sunset">Sunset</option>
+            </select>
         </div>
         
         <div class="flex-1 flex flex-col p-5 gap-3">
-            <label for="markdownInput" class="text-sm font-semibold text-slate-600 flex justify-between items-center">
+            <label for="markdownInput" class="text-sm font-semibold text-[var(--text-secondary)] flex justify-between items-center">
                 Paste Markdown Anda:
                 <button id="clearBtn" class="text-xs text-red-500 hover:text-red-700">Bersihkan</button>
             </label>
-            <textarea id="markdownInput" class="flex-1 w-full p-4 border border-slate-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono text-slate-700 leading-relaxed shadow-inner"></textarea>
+            <textarea id="markdownInput" class="flex-1 w-full p-4 border border-[var(--border-color)] bg-[var(--input-bg)] text-[var(--input-text)] rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono leading-relaxed shadow-inner transition-colors"></textarea>
             
             <div class="flex gap-2 mt-2">
                 <button id="generateBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-2">
                     <i data-lucide="play" class="w-5 h-5"></i>
                     Buat Mindmap
                 </button>
-                <button id="saveJsBtn" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-2" title="Simpan teks ke file lokal (.js)">
+                <button id="saveJsBtn" class="bg-[var(--text-primary)] hover:opacity-80 text-[var(--panel-bg)] font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-2" title="Simpan teks ke file lokal (.js)">
                     <i data-lucide="save" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -123,22 +176,22 @@
     </aside>
 
     <!-- Right Panel: Mindmap Canvas -->
-    <main id="rightPanel" class="w-full md:w-2/3 lg:w-3/4 h-1/2 md:h-full bg-slate-50 relative flex flex-col transition-all duration-300">
+    <main id="rightPanel" class="w-full md:w-2/3 lg:w-3/4 h-1/2 md:h-full bg-[var(--canvas-bg)] relative flex flex-col transition-all duration-300">
         
         <!-- Toolbar -->
         <div class="absolute top-4 right-4 z-30 flex gap-2">
-            <div class="bg-white rounded-lg shadow-sm border border-slate-200 flex p-1">
-                <button id="zoomInBtn" class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition" title="Zoom In">
+            <div class="bg-[var(--toolbar-bg)] rounded-lg shadow-sm border border-[var(--border-color)] flex p-1 transition-colors">
+                <button id="zoomInBtn" class="p-2 text-[var(--text-secondary)] hover:text-blue-600 hover:bg-[var(--toolbar-hover)] rounded-md transition" title="Zoom In">
                     <i data-lucide="zoom-in" class="w-5 h-5"></i>
                 </button>
-                <button id="zoomOutBtn" class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition" title="Zoom Out">
+                <button id="zoomOutBtn" class="p-2 text-[var(--text-secondary)] hover:text-blue-600 hover:bg-[var(--toolbar-hover)] rounded-md transition" title="Zoom Out">
                     <i data-lucide="zoom-out" class="w-5 h-5"></i>
                 </button>
-                <button id="fitViewBtn" class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition" title="Fit to Screen">
+                <button id="fitViewBtn" class="p-2 text-[var(--text-secondary)] hover:text-blue-600 hover:bg-[var(--toolbar-hover)] rounded-md transition" title="Fit to Screen">
                     <i data-lucide="maximize" class="w-5 h-5"></i>
                 </button>
             </div>
-            <button id="fullscreenBtn" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition" title="Toggle Fullscreen">
+            <button id="fullscreenBtn" class="bg-[var(--toolbar-bg)] p-3 rounded-lg shadow-sm border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-blue-600 hover:bg-[var(--toolbar-hover)] transition-colors" title="Toggle Fullscreen">
                 <i data-lucide="expand" class="w-5 h-5" id="fsIcon"></i>
             </button>
         </div>
@@ -149,13 +202,13 @@
         </div>
 
         <!-- Tooltip -->
-        <div id="tooltip" class="fixed hidden bg-slate-800 text-white p-4 rounded-xl text-sm shadow-2xl z-[100] pointer-events-none w-72 backdrop-blur-sm bg-opacity-95 transition-opacity duration-200">
-            <h4 id="tooltipTitle" class="font-bold text-blue-300 mb-2 border-b border-slate-600 pb-1"></h4>
-            <p id="tooltipDesc" class="leading-relaxed whitespace-pre-wrap"></p>
+        <div id="tooltip" class="fixed hidden bg-[var(--tooltip-bg)] text-[var(--tooltip-text)] p-4 rounded-xl text-sm shadow-2xl z-[100] pointer-events-none w-72 backdrop-blur-sm transition-opacity duration-200 border border-[var(--border-color)]">
+            <h4 id="tooltipTitle" class="font-bold mb-2 border-b border-[var(--border-color)] pb-1 opacity-90"></h4>
+            <p id="tooltipDesc" class="leading-relaxed whitespace-pre-wrap opacity-90"></p>
         </div>
         
         <!-- Instructions overlay -->
-        <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
+        <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-[var(--text-secondary)] pointer-events-none transition-colors">
             <i data-lucide="git-merge" class="w-16 h-16 mb-4 opacity-50"></i>
             <p class="text-lg font-medium">Klik "Buat Mindmap" untuk merender data</p>
             <p class="text-sm mt-2">Gunakan Scroll untuk Zoom, Drag untuk Pan, Klik Node untuk Expand/Collapse</p>
@@ -168,6 +221,18 @@
     <script>
         // Inisialisasi Icons
         lucide.createIcons();
+
+        // Mengelola Pergantian Tema
+        const themeSelect = document.getElementById('themeSelect');
+        
+        themeSelect.addEventListener('change', (e) => {
+            const selectedTheme = e.target.value;
+            document.body.className = `h-screen w-screen overflow-hidden flex flex-col md:flex-row ${selectedTheme} transition-colors duration-300`;
+            // Re-render D3.js agar warnanya ter-update sesuai tema
+            if (rootD3) {
+                updateMindmap(rootD3);
+            }
+        });
 
         // Data Default dari user
         const defaultText = `1. THE BLOCKS (Master Data / Foundation Entities)
@@ -410,6 +475,58 @@ Management's eagle eye to oversee all assembled and running Lego blocks.
             return tree[0];
         }
 
+        // --- FUNGSI WARNA DINAMIS BERDASARKAN TEMA ---
+        function getThemeBranchColors() {
+            const isDark = document.body.classList.contains('theme-dark');
+            if (isDark) {
+                // Warna pastel yang lebih gelap untuk Dark Theme agar tidak mencolok mata
+                return [
+                    { border: '#3b82f6', bg: '#1e3a8a', text: '#bfdbfe' }, // Biru
+                    { border: '#10b981', bg: '#064e3b', text: '#a7f3d0' }, // Hijau
+                    { border: '#8b5cf6', bg: '#4c1d95', text: '#ddd6fe' }, // Ungu
+                    { border: '#f59e0b', bg: '#78350f', text: '#fde68a' }, // Amber
+                    { border: '#ec4899', bg: '#831843', text: '#fbcfe8' }, // Pink
+                    { border: '#06b6d4', bg: '#164e63', text: '#cffafe' }, // Cyan
+                    { border: '#ef4444', bg: '#7f1d1d', text: '#fecaca' }, // Merah
+                ];
+            }
+            // Default: Warna cerah (berlaku untuk tema Light, Ocean, Sunset)
+            return [
+                { border: '#3b82f6', bg: '#eff6ff', text: '#1e3a8a' }, // Biru
+                { border: '#10b981', bg: '#ecfdf5', text: '#064e3b' }, // Hijau
+                { border: '#8b5cf6', bg: '#f5f3ff', text: '#4c1d95' }, // Ungu
+                { border: '#f59e0b', bg: '#fffbeb', text: '#78350f' }, // Amber
+                { border: '#ec4899', bg: '#fdf2f8', text: '#831843' }, // Pink
+                { border: '#06b6d4', bg: '#ecfeff', text: '#164e63' }, // Cyan
+                { border: '#ef4444', bg: '#fef2f2', text: '#7f1d1d' }, // Merah
+            ];
+        }
+
+        function getNodeColor(d) {
+            const isDark = document.body.classList.contains('theme-dark');
+            
+            // Titik Pusat Mindmap (Root Node)
+            if (d.depth === 0) {
+                return isDark 
+                    ? { border: '#64748b', bg: '#334155', text: '#f8fafc' } 
+                    : { border: '#475569', bg: '#f8fafc', text: '#0f172a' };
+            }
+            
+            // Cari moyang/ancestor level 1 dari node ini (Cabang Utama)
+            let ancestor = d;
+            while (ancestor.depth > 1) {
+                ancestor = ancestor.parent;
+            }
+            
+            // Tentukan warna dari urutan/indeks ancestor di dalam root
+            let rootChildren = rootD3.children || rootD3._children || [];
+            let index = rootChildren.indexOf(ancestor);
+            if(index === -1) index = 0;
+            
+            const branchColors = getThemeBranchColors();
+            return branchColors[index % branchColors.length];
+        }
+
         // Fungsi Render/Update D3 Tree
         function updateMindmap(source) {
             // D3 Tree Layout Setup. 
@@ -428,34 +545,6 @@ Management's eagle eye to oversee all assembled and running Lego blocks.
                 d.x = d.y; 
                 d.y = temp;
             });
-
-            // --- FUNGSI WARNA DINAMIS ---
-            const branchColors = [
-                { border: '#3b82f6', bg: '#eff6ff', text: '#1e3a8a' }, // Biru
-                { border: '#10b981', bg: '#ecfdf5', text: '#064e3b' }, // Hijau
-                { border: '#8b5cf6', bg: '#f5f3ff', text: '#4c1d95' }, // Ungu
-                { border: '#f59e0b', bg: '#fffbeb', text: '#78350f' }, // Amber
-                { border: '#ec4899', bg: '#fdf2f8', text: '#831843' }, // Pink
-                { border: '#06b6d4', bg: '#ecfeff', text: '#164e63' }, // Cyan
-                { border: '#ef4444', bg: '#fef2f2', text: '#7f1d1d' }, // Merah
-            ];
-
-            function getNodeColor(d) {
-                if (d.depth === 0) return { border: '#475569', bg: '#f8fafc', text: '#0f172a' }; // Abu-abu gelap untuk root/titik pusat
-                
-                // Cari moyang/ancestor level 1 dari node ini (Cabang Utama)
-                let ancestor = d;
-                while (ancestor.depth > 1) {
-                    ancestor = ancestor.parent;
-                }
-                
-                // Tentukan warna dari urutan/indeks ancestor di dalam root
-                let rootChildren = rootD3.children || rootD3._children || [];
-                let index = rootChildren.indexOf(ancestor);
-                if(index === -1) index = 0;
-                
-                return branchColors[index % branchColors.length];
-            }
 
             // --- NODES ---
             const node = g.selectAll('g.node')
@@ -484,7 +573,6 @@ Management's eagle eye to oversee all assembled and running Lego blocks.
                 const isCollapsed = d._children && d._children.length > 0;
                 const hasAnyChild = isExpanded || isCollapsed;
                 
-                // Perbaikan: Konversi menjadi Boolean secara eksplisit agar valid saat dievaluasi
                 const hasTooltip = Boolean(d.data.description && d.data.description.trim() !== "");
                 const color = getNodeColor(d);
                 
@@ -496,20 +584,19 @@ Management's eagle eye to oversee all assembled and running Lego blocks.
                 if (hasAnyChild) {
                     const icon = isCollapsed ? '+' : '−'; // Minus sign
                     indicatorHTML = `
-                    <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 rounded-full flex items-center justify-center text-sm font-bold z-10" 
-                         style="border-color: ${color.border}; color: ${color.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                    <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 border-2 rounded-full flex items-center justify-center text-sm font-bold z-10 transition-colors" 
+                         style="background-color: ${color.bg}; border-color: ${color.border}; color: ${color.text}; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                         ${icon}
                     </div>
                     `;
                 }
                 
-                // Perbaikan: Letakkan negasi (!) di dalam evaluasi template string ${!hasTooltip}
                 return `
                 <div class="${classes}" style="border-left: 5px solid ${color.border}; background-color: ${color.bg}; color: ${color.text}; width: ${nodeWidth}px; height: 100%;">
                     <div class="line-clamp-2 w-full font-semibold pr-3" onmouseenter="if(${!hasTooltip} && this.scrollHeight > this.clientHeight) this.title = this.innerText; else this.title = '';">
                         ${d.data.name}
                     </div>
-                    ${hasTooltip ? '<div class="absolute right-2 top-2 w-2.5 h-2.5 bg-amber-400 rounded-full border border-white shadow-sm" title="Ada catatan tambahan"></div>' : ''}
+                    ${hasTooltip ? '<div class="absolute right-2 top-2 w-2.5 h-2.5 bg-amber-400 rounded-full border border-[var(--panel-bg)] shadow-sm" title="Ada catatan tambahan"></div>' : ''}
                     ${indicatorHTML}
                 </div>
                 `;
@@ -749,13 +836,16 @@ Management's eagle eye to oversee all assembled and running Lego blocks.
             document.getElementById('markdownInput').value = defaultText;
         }
         
-        // Otomatis buat mindmap (mengklik tombol secara programmatis)
-        document.getElementById('generateBtn').click();
+        // Otomatis jalankan mode fullscreen SECARA INSTAN saat pertama kali dimuat
+        isFullscreen = true;
+        document.getElementById('rightPanel').classList.add('is-fullscreen');
+        document.getElementById('fsIcon').setAttribute('data-lucide', 'shrink');
+        lucide.createIcons();
         
-        // Otomatis jalankan mode fullscreen
-        if (!isFullscreen) {
-            document.getElementById('fullscreenBtn').click();
-        }
+        // Otomatis buat mindmap dengan jeda sangat singkat agar DOM sempat menyesuaikan ukuran layar penuh
+        setTimeout(() => {
+            document.getElementById('generateBtn').click();
+        }, 100);
 
     </script>
 </body>
