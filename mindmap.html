@@ -484,7 +484,8 @@ Management's eagle eye to oversee all assembled and running Lego blocks.
                 const isCollapsed = d._children && d._children.length > 0;
                 const hasAnyChild = isExpanded || isCollapsed;
                 
-                const hasTooltip = d.data.description && d.data.description.trim() !== "";
+                // Perbaikan: Konversi menjadi Boolean secara eksplisit agar valid saat dievaluasi
+                const hasTooltip = Boolean(d.data.description && d.data.description.trim() !== "");
                 const color = getNodeColor(d);
                 
                 let classes = "node-card relative";
@@ -502,9 +503,10 @@ Management's eagle eye to oversee all assembled and running Lego blocks.
                     `;
                 }
                 
+                // Perbaikan: Letakkan negasi (!) di dalam evaluasi template string ${!hasTooltip}
                 return `
                 <div class="${classes}" style="border-left: 5px solid ${color.border}; background-color: ${color.bg}; color: ${color.text}; width: ${nodeWidth}px; height: 100%;">
-                    <div class="line-clamp-2 w-full font-semibold pr-3">
+                    <div class="line-clamp-2 w-full font-semibold pr-3" onmouseenter="if(${!hasTooltip} && this.scrollHeight > this.clientHeight) this.title = this.innerText; else this.title = '';">
                         ${d.data.name}
                     </div>
                     ${hasTooltip ? '<div class="absolute right-2 top-2 w-2.5 h-2.5 bg-amber-400 rounded-full border border-white shadow-sm" title="Ada catatan tambahan"></div>' : ''}
